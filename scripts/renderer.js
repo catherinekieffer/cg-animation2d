@@ -1,4 +1,6 @@
 import * as CG from './transforms.js';
+import { Matrix } from "./matrix.js";
+
 
 class Renderer {
     // canvas:              object ({id: __, width: __, height: __})
@@ -20,15 +22,44 @@ class Renderer {
                 // example model (diamond) -> should be replaced with actual model
                 {
                     vertices: [
+                        CG.Vector3(400, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(500, 300, 1),
+                        CG.Vector3(400, 450, 1),
+                        CG.Vector3(300, 300, 1)
+                        //we just add more edges here to be a circle!
+                    ],
+                    transform: null
+                }
+            ],
+            slide1: [
+                {
+                    vertices: [
                         CG.Vector3(400, 150, 1),
                         CG.Vector3(500, 300, 1),
                         CG.Vector3(400, 450, 1),
                         CG.Vector3(300, 300, 1)
                     ],
                     transform: null
+                },
+                {
+                    vertices: [
+                        CG.Vector3(200, 50, 1),
+                        CG.Vector3(300, 200, 1),
+                        CG.Vector3(200, 350, 1),
+                        CG.Vector3(100, 200, 1)
+                    ],
+                    transform: null
+                },
+                {
+                    vertices: [
+                        CG.Vector3(600, 150, 1),
+                        CG.Vector3(700, 300, 1),
+                        CG.Vector3(600, 450, 1),
+                        CG.Vector3(500, 300, 1)
+                    ],
+                    transform: null
                 }
             ],
-            slide1: [],
             slide2: [],
             slide3: []
         };
@@ -85,7 +116,28 @@ class Renderer {
 
     //
     updateTransforms(time, delta_time) {
-        // TODO: update any transformations needed for animation
+        //Slide0 - bouncing ball
+        let velocity_x = 40;
+        let velocity_y = 60;
+        let t_x = velocity_x * time/1000;
+        let t_y = velocity_y * time/1000;
+        
+        if (t_x > this.canvas.width) {
+            t_x = -1*t_x
+            console.log(t_x);
+        }
+        let transform = CG.mat3x3Translate(new Matrix(3,3), t_x, t_y);
+        this.models.slide0[0].transform = transform;
+
+
+        //slide1 - spinning polygons
+        let vel_x_polygon_1 = 40;
+        let vel_y_polygon_1 = 60;
+
+        //this.models.slide1[0].transform = transform
+        //this.models.slide1[1].transform = transform
+        //this.models.slide1[2].transform = transform
+
     }
     
     //
@@ -110,19 +162,42 @@ class Renderer {
 
     //
     drawSlide0() {
-        // TODO: draw bouncing ball (circle that changes direction whenever it hits an edge)
-        
-        
-        // Following lines are example of drawing a single polygon
-        // (this should be removed/edited after you implement the slide)
         let teal = [0, 128, 128, 255];
-        this.drawConvexPolygon(this.models.slide0[0].vertices, teal);
+        console.log(this.models.slide0[0].vertices[0])
+        console.log(this.models.slide0[0].transform)
+
+        let vertices = [];
+        for (let i=0; i < this.models.slide0[0].vertices.length; i++) {
+            console.log(i);
+            let new_vertex = Matrix.multiply([this.models.slide0[0].transform, this.models.slide0[0].vertices[i]]);
+            vertices.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices, teal);
     }
 
-    //
+    
     drawSlide1() {
         // TODO: draw at least 3 polygons that spin about their own centers
         //   - have each polygon spin at a different speed / direction
+
+        let teal = [0, 128, 128, 255];
+
+        for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
+
+        }
+
+        for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
+            
+        }
+
+        for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
+            
+        }
+
+        this.drawConvexPolygon(this.models.slide1[0].vertices, teal);
+        this.drawConvexPolygon(this.models.slide1[1].vertices, teal);
+        this.drawConvexPolygon(this.models.slide1[2].vertices, teal);
+
         
         
     }
@@ -164,3 +239,9 @@ class Renderer {
 };
 
 export { Renderer };
+
+
+
+// function main () {
+//     animate(Date.now());
+// }
