@@ -131,8 +131,13 @@ class Renderer {
 
 
         //slide1 - spinning polygons
-        let vel_x_polygon_1 = 40;
-        let vel_y_polygon_1 = 60;
+        let theta = 10;
+        let theta_new = theta*time/100000;
+
+        let spin_polygon_1_transform = CG.mat3x3Rotate(new Matrix(3,3), theta_new);
+        this.models.slide1[0].transform = spin_polygon_1_transform;
+        console.log(this.models.slide1[0].transform);
+
 
         //this.models.slide1[0].transform = transform
         //this.models.slide1[1].transform = transform
@@ -182,10 +187,16 @@ class Renderer {
 
         let teal = [0, 128, 128, 255];
 
+        let vertices_one = [];
         for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
-
+            console.log(i);
+            console.log(this.models.slide1[0].transform);
+            let new_vertex = Matrix.multiply([this.models.slide1[0].transform, this.models.slide1[0].vertices[i]]);
+            vertices_one.push(new_vertex);
         }
+        this.drawConvexPolygon(vertices_one, teal);
 
+        let vertices_two = [];
         for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
             
         }
@@ -194,11 +205,8 @@ class Renderer {
             
         }
 
-        this.drawConvexPolygon(this.models.slide1[0].vertices, teal);
-        this.drawConvexPolygon(this.models.slide1[1].vertices, teal);
-        this.drawConvexPolygon(this.models.slide1[2].vertices, teal);
-
-        
+        // this.drawConvexPolygon(this.models.slide1[1].vertices, teal);
+        // this.drawConvexPolygon(this.models.slide1[2].vertices, teal);
         
     }
 
