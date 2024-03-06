@@ -60,7 +60,17 @@ class Renderer {
                     transform: null
                 }
             ],
-            slide2: [],
+            slide2: [                
+                {
+                    vertices: [
+                        CG.Vector3(400, 150, 1),
+                        CG.Vector3(500, 300, 1),
+                        CG.Vector3(400, 450, 1),
+                        CG.Vector3(300, 300, 1)
+                    ],
+                    transform: null
+                }
+            ],
             slide3: []
         };
     }
@@ -119,8 +129,13 @@ class Renderer {
         //Slide0 - bouncing ball
         let velocity_x = 40;
         let velocity_y = 60;
+        
         let t_x = velocity_x * time/1000;
         let t_y = velocity_y * time/1000;
+
+        //if the ball has reached the edge of the canvas, velocity should become 
+        // 40, 80, 120 - then if you hit the edge, it would become -120 and it would fold over like a piece of paper
+        //   because -120 is wrong - it should be -80 -> so you need to just subract the velocity from itself?
         
         if (t_x > this.canvas.width) {
             t_x = -1*t_x
@@ -130,18 +145,31 @@ class Renderer {
         this.models.slide0[0].transform = transform;
 
 
-        //slide1 - spinning polygons
+        //Slide1 - spinning polygons
+
+        // velocity = revolutions/second and direction! - velocity is basically theta, correcT?
+
         let theta = 10;
         let theta_new = theta*time/100000;
 
         let spin_polygon_1_transform = CG.mat3x3Rotate(new Matrix(3,3), theta_new);
         this.models.slide1[0].transform = spin_polygon_1_transform;
-        console.log(this.models.slide1[0].transform);
+        // console.log(this.models.slide1[0].transform);
 
 
-        //this.models.slide1[0].transform = transform
         //this.models.slide1[1].transform = transform
         //this.models.slide1[2].transform = transform
+
+        //Slide2 - Grow/shrink
+        let sx = .1;
+        let sy= .1;
+
+        let s_x = sx*time/1000;
+        let s_y = sy*time/1000;
+
+        let grow_shrink_1_transform = CG.mat3x3Scale(new Matrix(3,3), s_x, s_y);
+        this.models.slide2[0].transform = grow_shrink_1_transform;
+        console.log(this.models.slide2[0].transform);
 
     }
     
@@ -168,12 +196,11 @@ class Renderer {
     //
     drawSlide0() {
         let teal = [0, 128, 128, 255];
-        console.log(this.models.slide0[0].vertices[0])
-        console.log(this.models.slide0[0].transform)
+        // console.log(this.models.slide0[0].vertices[0])
+        // console.log(this.models.slide0[0].transform)
 
         let vertices = [];
         for (let i=0; i < this.models.slide0[0].vertices.length; i++) {
-            console.log(i);
             let new_vertex = Matrix.multiply([this.models.slide0[0].transform, this.models.slide0[0].vertices[i]]);
             vertices.push(new_vertex);
         }
@@ -189,12 +216,13 @@ class Renderer {
 
         let vertices_one = [];
         for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
-            console.log(i);
-            console.log(this.models.slide1[0].transform);
+            // console.log(i);
+            // console.log(this.models.slide1[0].transform);
             let new_vertex = Matrix.multiply([this.models.slide1[0].transform, this.models.slide1[0].vertices[i]]);
             vertices_one.push(new_vertex);
         }
         this.drawConvexPolygon(vertices_one, teal);
+
 
         let vertices_two = [];
         for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
@@ -216,6 +244,17 @@ class Renderer {
         //   - have each polygon grow / shrink different sizes
         //   - try at least 1 polygon that grows / shrinks non-uniformly in the x and y directions
 
+        let teal = [0, 128, 128, 255];
+
+        let vertices_one = [];
+        for (let i=0; i < this.models.slide2[0].vertices.length; i++) {
+            console.log(i);
+            // console.log(this.models.slide2[0].transform);
+            let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[0].vertices[i]]);
+            vertices_one.push(new_vertex);
+            console.log(vertices_one);
+        }
+        this.drawConvexPolygon(vertices_one, teal);
 
     }
 
