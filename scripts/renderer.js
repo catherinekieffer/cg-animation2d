@@ -22,11 +22,15 @@ class Renderer {
                 // example model (diamond) -> should be replaced with actual model
                 {
                     vertices: [
-                        CG.Vector3(400, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
-                        CG.Vector3(500, 300, 1),
-                        CG.Vector3(400, 450, 1),
-                        CG.Vector3(300, 300, 1)
-                        //we just add more edges here to be a circle!
+                        CG.Vector3(400, 500, 1),
+                        CG.Vector3(450, 450, 1),
+                        CG.Vector3(500, 400, 1),
+                        CG.Vector3(450, 350, 1),
+                        CG.Vector3(400, 300, 1),
+                        CG.Vector3(350, 350, 1),
+                        CG.Vector3(300, 400, 1),
+                        CG.Vector3(350, 450, 1)
+
                     ],
                     transform: null
                 }
