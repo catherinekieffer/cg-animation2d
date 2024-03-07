@@ -17,21 +17,37 @@ class Renderer {
         this.start_time = null;
         this.prev_time = null;
 
-        this.models = {
+        this.models = { //defining models in model space
             slide0: [
                 // example model (diamond) -> should be replaced with actual model
                 {
                     vertices: [
-                        CG.Vector3(400, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
-                        CG.Vector3(500, 300, 1),
-                        CG.Vector3(400, 450, 1),
-                        CG.Vector3(300, 300, 1)
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1),
                         //we just add more edges here to be a circle!
                     ],
-                    transform: null
+                    transform: null,
+                    current: [
+                            CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                            CG.Vector3(-150, 0, 1),
+                            CG.Vector3(0, -150, 1),
+                            CG.Vector3(150, 0, 1)
+                            //we just add more edges here to be a circle!
+                        ],
                 }
             ],
             slide1: [
+                {
+                    origin:  [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1),
+                        //we just add more edges here to be a circle!
+                    ],
+                },
                 {
                     vertices: [
                         CG.Vector3(400, 150, 1),
@@ -60,7 +76,15 @@ class Renderer {
                     transform: null
                 }
             ],
-            slide2: [                
+            slide2: [  
+                {
+                    origin:  [
+                        CG.Vector3(0, 150, 1),
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1),
+                    ],
+                },              
                 {
                     vertices: [
                         CG.Vector3(400, 150, 1),
@@ -127,49 +151,68 @@ class Renderer {
     //
     updateTransforms(time, delta_time) {
         //Slide0 - bouncing ball
-        let velocity_x = 40;
-        let velocity_y = 60;
-        
-        let t_x = velocity_x * time/1000;
-        let t_y = velocity_y * time/1000;
 
-        //if the ball has reached the edge of the canvas, velocity should become 
-        // 40, 80, 120 - then if you hit the edge, it would become -120 and it would fold over like a piece of paper
-        //   because -120 is wrong - it should be -80 -> so you need to just subract the velocity from itself?
+        //calculate what the translation will be
+        // Matrix M transform = velocity*delta_time + P(old position)
+
+        //if you need to do two things, you can do T(tx, tx)*R(theta) - spinning and moving... etc
+        //                                           rotate first, translate second
+
+        let velocity_x = 80;
+        let velocity_y = 50;
         
+        let t_x = velocity_x * delta_time/1000; // ---------------->>>>> how can you use this to determine the locaiton? becuase we are going to multiply this by the current in drawslide....?
+        let t_y = velocity_y * delta_time/1000;
+
+        // console.log(t_x);
+        //gets to 1324 and then bounces between 3 numbers...?
+        //t_x only get to 13.....? its because of my delta_time?
         if (t_x > this.canvas.width) {
-            t_x = -1*t_x
-            console.log(t_x);
-        }
+            t_x = -1*t_x;
+        } 
+
+
         let transform = CG.mat3x3Translate(new Matrix(3,3), t_x, t_y);
         this.models.slide0[0].transform = transform;
 
 
-        //Slide1 - spinning polygons
-
-        // velocity = revolutions/second and direction! - velocity is basically theta, correcT?
-
+        // Slide1 - spinning polygons
+        // ------ Polygon 1 ------
         let theta = 10;
         let theta_new = theta*time/100000;
 
-        let spin_polygon_1_transform = CG.mat3x3Rotate(new Matrix(3,3), theta_new);
-        this.models.slide1[0].transform = spin_polygon_1_transform;
-        // console.log(this.models.slide1[0].transform);
+        let rotation = CG.mat3x3Rotate(new Matrix(3,3), theta_new);
+        let translation_matrix = CG.mat3x3Translate(new Matrix(3,3), 200, 200);
+        let transform_final = Matrix.multiply([translation_matrix, rotation]);
+        this.models.slide1[0].transform = transform_final;
+
+        // ------ Polygon 2 ------ (spinning opposite)
+
+        // ------ Polygon 3 ------ (different speed)
 
 
-        //this.models.slide1[1].transform = transform
-        //this.models.slide1[2].transform = transform
-
-        //Slide2 - Grow/shrink
+        // Slide2 - Grow/shrink
         let sx = .1;
         let sy= .1;
+        let s_x = 0;
+        let s_y = 0;
 
-        let s_x = sx*time/1000;
-        let s_y = sy*time/1000;
+        if (s_x <= .3 || s_y <= .3) {
+            s_x = sx*(delta_time/1000); //.1* 1, .1* 2
+            s_y = sy*(delta_time/1000);
+        }
+        
+        // console.log(s_x)
+        if (s_x > .2  || s_y > .2) {
+            s_x = sx/(delta_time/1000);
+            s_y = sy/(delta_time/1000);
+        }
 
-        let grow_shrink_1_transform = CG.mat3x3Scale(new Matrix(3,3), s_x, s_y);
-        this.models.slide2[0].transform = grow_shrink_1_transform;
-        console.log(this.models.slide2[0].transform);
+        let grow_shrink = CG.mat3x3Scale(new Matrix(3,3), s_x, s_y);
+
+        let translation_matrix_grow_shrink = CG.mat3x3Translate(new Matrix(3,3), 200, 200);
+        let transform_final_grow_shrink = Matrix.multiply([translation_matrix_grow_shrink, grow_shrink]);
+        this.models.slide2[0].transform = transform_final_grow_shrink;
 
     }
     
@@ -196,14 +239,13 @@ class Renderer {
     //
     drawSlide0() {
         let teal = [0, 128, 128, 255];
-        // console.log(this.models.slide0[0].vertices[0])
-        // console.log(this.models.slide0[0].transform)
-
         let vertices = [];
-        for (let i=0; i < this.models.slide0[0].vertices.length; i++) {
-            let new_vertex = Matrix.multiply([this.models.slide0[0].transform, this.models.slide0[0].vertices[i]]);
+        for (let i=0; i < this.models.slide0[0].current.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide0[0].transform, this.models.slide0[0].current[i]]);
             vertices.push(new_vertex);
         }
+        this.models.slide0[0].current = vertices;
+        // console.log(this.models.slide0[0].current);
         this.drawConvexPolygon(vertices, teal);
     }
 
@@ -215,23 +257,21 @@ class Renderer {
         let teal = [0, 128, 128, 255];
 
         let vertices_one = [];
-        for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
-            // console.log(i);
-            // console.log(this.models.slide1[0].transform);
-            let new_vertex = Matrix.multiply([this.models.slide1[0].transform, this.models.slide1[0].vertices[i]]);
+        for (let i=0; i < this.models.slide1[0].origin.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide1[0].transform, this.models.slide1[0].origin[i]]);
             vertices_one.push(new_vertex);
         }
         this.drawConvexPolygon(vertices_one, teal);
 
 
-        let vertices_two = [];
-        for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
+        // let vertices_two = [];
+        // for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
             
-        }
+        // }
 
-        for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
+        // for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
             
-        }
+        // }
 
         // this.drawConvexPolygon(this.models.slide1[1].vertices, teal);
         // this.drawConvexPolygon(this.models.slide1[2].vertices, teal);
@@ -247,13 +287,11 @@ class Renderer {
         let teal = [0, 128, 128, 255];
 
         let vertices_one = [];
-        for (let i=0; i < this.models.slide2[0].vertices.length; i++) {
-            console.log(i);
-            // console.log(this.models.slide2[0].transform);
-            let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[0].vertices[i]]);
+        for (let i=0; i < this.models.slide2[1].vertices.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[1].vertices[i]]);
             vertices_one.push(new_vertex);
-            console.log(vertices_one);
         }
+        this.models.slide2[1].vertices = vertices_one;
         this.drawConvexPolygon(vertices_one, teal);
 
     }
@@ -285,10 +323,6 @@ class Renderer {
     }
 };
 
+
 export { Renderer };
 
-
-
-// function main () {
-//     animate(Date.now());
-// }
