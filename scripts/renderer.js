@@ -1,7 +1,6 @@
 import * as CG from './transforms.js';
 import { Matrix } from "./matrix.js";
 
-
 class Renderer {
     // canvas:              object ({id: __, width: __, height: __})
     // limit_fps_flag:      bool 
@@ -100,9 +99,70 @@ class Renderer {
                         CG.Vector3(0, -150, 1),
                         CG.Vector3(150, 0, 1)
                     ],
-                }
+                },
             ],
-            slide3: []
+            slide3: [
+                {
+                    transform: null,
+                    s_x: 1,
+                    s_y: 1,
+                    size_x: .1, //how fast it grows in the x direction
+                    size_y: .3,
+                    magnitude: 1.2, //how big it gets
+                    origin: [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1)
+                    ],
+                },
+                {
+                    transform: null,
+                    s_x: 1,
+                    s_y: 1,
+                    size_x: .1, //how fast it grows in the x direction
+                    size_y: .3,
+                    magnitude: 1.2, //how big it gets
+                    origin: [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1)
+                    ],
+                },
+                {
+                    transform: null,
+                    s_x: 1,
+                    s_y: 1,
+                    size_x: .1, //how fast it grows in the x direction
+                    size_y: .3,
+                    magnitude: 1.2, //how big it gets
+                    origin: [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1)
+                    ],
+                },
+                {
+                    origin: [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1),
+                        //we just add more edges here to be a circle!
+                        ],
+                },
+                {
+                    vertices: [
+                        CG.Vector3(400, 150, 1),
+                        CG.Vector3(500, 300, 1),
+                        CG.Vector3(400, 450, 1),
+                        CG.Vector3(300, 300, 1)
+                    ],
+                    transform: null
+                },
+            ],
         };
     }
 
@@ -170,19 +230,19 @@ class Renderer {
         let t_y = this.models.slide0[0].t_y + velocity_y * delta_time/1000;
 
         // if t_x is too wide, flip the velocity of the x and set that to negative in the model
-        if (t_x > this.canvas.width-140) {
+        if (t_x > this.canvas.width-50) {
             velocity_x = -1*velocity_x;
             t_x = this.models.slide0[0].t_x + (velocity_x * delta_time/1000);
             this.models.slide0[0].velocity_x = velocity_x;
-        } else if (t_x < 140) {
+        } else if (t_x < 50) {
             velocity_x = -1*velocity_x;
             t_x = this.models.slide0[0].t_x + (velocity_x * delta_time/1000);
             this.models.slide0[0].velocity_x = velocity_x;
-        } else if (t_y > this.canvas.height-140) {
+        } else if (t_y > this.canvas.height-50) {
             velocity_y = -1*velocity_y;
             t_y = this.models.slide0[0].t_y + (velocity_y * delta_time/1000);
             this.models.slide0[0].velocity_y = velocity_y;
-        } else if (t_y < 140) {
+        } else if (t_y < 50) {
             velocity_y = -1*velocity_y;
             t_y = this.models.slide0[0].t_y + (velocity_y * delta_time/1000);
             this.models.slide0[0].velocity_y = velocity_y;
@@ -296,6 +356,118 @@ class Renderer {
         let translation_matrix_grow_shrink_2 = CG.mat3x3Translate(new Matrix(3,3), 600, 300); // move the matrix 200 pixels
         let transform_final_grow_shrink_2 = Matrix.multiply([translation_matrix_grow_shrink_2, grow_shrink_2]); //grow the matrix, then move it
         this.models.slide2[1].transform = transform_final_grow_shrink_2
+
+        // ------------------------------------
+        // Slide3 - FUN!
+        // ------------------------------------
+        // Part 1: Polygons growing
+        // ------------------------------------
+        let size_x_3 = this.models.slide3[0].size_x; 
+        let size_y_3 = this.models.slide3[0].size_y;
+        let s_x_3 = this.models.slide3[0].s_x + size_x_3 * delta_time / 1000;
+        let s_y_3 = this.models.slide3[0].s_y + size_y_3 * delta_time / 1000;
+        if (s_x_3 > this.models.slide3[0].magnitude) {
+            size_x_3 = -1 * size_x_3;
+            size_y_3 = -1 * size_y_3;
+            s_x_3 = this.models.slide3[0].s_x + (size_x_3 * delta_time / 1000); 
+            s_y_3 = this.models.slide3[0].s_y + (size_y_3 * delta_time / 1000);
+            this.models.slide3[0].size_x = size_x_3;
+            this.models.slide3[0].size_y = size_y_3;
+        } else if (s_x_3 < 0) {
+            size_x_3 = -1 * size_x_3;
+            size_y_3 = -1 * size_y_3;
+            s_x_3 = this.models.slide3[0].s_x + (size_x_3 * delta_time / 1000); 
+            s_y_3 = this.models.slide3[0].s_y + (size_y_3 * delta_time / 1000);
+            this.models.slide3[0].size_x = size_x_3;
+            this.models.slide3[0].size_y = size_y_3;
+        }
+
+        this.models.slide3[0].s_x = s_x_3;
+        this.models.slide3[0].s_y = s_y_3;
+
+        let grow_shrink_3 = CG.mat3x3Scale(new Matrix(3, 3), s_x_3, s_y_3);
+        let translation_matrix_grow_shrink_3 = CG.mat3x3Translate(new Matrix(3, 3), 600, 300); 
+        let transform_final_grow_shrink_3 = Matrix.multiply([translation_matrix_grow_shrink_3, grow_shrink_3]); 
+        this.models.slide3[0].transform = transform_final_grow_shrink_3;
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        let size_x_4 = this.models.slide3[1].size_x;
+        let size_y_4 = this.models.slide3[1].size_y;
+        let s_x_4 = this.models.slide3[1].s_x + size_x_4 * delta_time / 1000;
+        let s_y_4 = this.models.slide3[1].s_y + size_y_4 * delta_time / 1000;
+        if (s_x_4 > this.models.slide3[1].magnitude) {
+            size_x_4 = -1 * size_x_4;
+            size_y_4 = -1 * size_y_4;
+            s_x_4 = this.models.slide3[1].s_x + (size_x_4 * delta_time / 1000); 
+            s_y_4 = this.models.slide3[1].s_y + (size_y_4 * delta_time / 1000);
+            this.models.slide3[1].size_x = size_x_4;
+            this.models.slide3[1].size_y = size_y_4;
+        } else if (s_x_4 < 0) {
+            size_x_4 = -1 * size_x_4;
+            size_y_4 = -1 * size_y_4;
+            s_x_4 = this.models.slide3[1].s_x + (size_x_4 * delta_time / 1000); 
+            s_y_4 = this.models.slide3[1].s_y + (size_y_4 * delta_time / 1000);
+            this.models.slide3[1].size_x = size_x_4;
+            this.models.slide3[1].size_y = size_y_4;
+        }
+
+        this.models.slide3[1].s_x = s_x_4;
+        this.models.slide3[1].s_y = s_y_4;
+
+        let grow_shrink_4 = CG.mat3x3Scale(new Matrix(3, 3), s_x_4, s_y_4);
+        let translation_matrix_grow_shrink_4 = CG.mat3x3Translate(new Matrix(3, 3), 200, 300); 
+        let transform_final_grow_shrink_4 = Matrix.multiply([translation_matrix_grow_shrink_4, grow_shrink_4]); 
+        this.models.slide3[1].transform = transform_final_grow_shrink_4;
+
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        let size_x_5 = this.models.slide3[2].size_x; 
+        let size_y_5 = this.models.slide3[2].size_y;
+        let s_x_5 = this.models.slide3[2].s_x + size_x_5 * delta_time / 1000;
+        let s_y_5 = this.models.slide3[2].s_y + size_y_5 * delta_time / 1000;
+        if (s_x_5 > this.models.slide3[2].magnitude) {
+            size_x_5 = -1 * size_x_5;
+            size_y_5 = -1 * size_y_5;
+            s_x_5 = this.models.slide3[2].s_x + (size_x_5 * delta_time / 1000); 
+            s_y_5 = this.models.slide3[2].s_y + (size_y_5 * delta_time / 1000);
+            this.models.slide3[2].size_x = size_x_5;
+            this.models.slide3[2].size_y = size_y_5;
+        } else if (s_x_5 < 0) {
+            size_x_5 = -1 * size_x_5;
+            size_y_5 = -1 * size_y_5;
+            s_x_5 = this.models.slide3[2].s_x + (size_x_5 * delta_time / 1000);
+            s_y_5 = this.models.slide3[2].s_y + (size_y_5 * delta_time / 1000);
+            this.models.slide3[2].size_x = size_x_5;
+            this.models.slide3[2].size_y = size_y_5;
+        }
+
+        this.models.slide3[2].s_x = s_x_5;
+        this.models.slide3[2].s_y = s_y_5;
+
+        let grow_shrink_5 = CG.mat3x3Scale(new Matrix(3, 3), s_x_5, s_y_5);
+        let translation_matrix_grow_shrink_5 = CG.mat3x3Translate(new Matrix(3, 3), 400, 300); 
+        let transform_final_grow_shrink_5 = Matrix.multiply([translation_matrix_grow_shrink_5, grow_shrink_5]); 
+        this.models.slide3[2].transform = transform_final_grow_shrink_5;
+
+        // ------------------------------------
+        // Part 2: Moving Polygons
+        // ------------------------------------
+        this.models.slide3[4].size_x = 0.01; // Example size_x value
+        this.models.slide3[4].size_y = 0.01; // Example size_y value
+
+        let theta3 = 10;
+        let theta_new3 = theta3 * time / 100000;
+
+        let rotation3 = CG.mat3x3Rotate(new Matrix(3, 3), theta_new3);
+        let translation_matrix3 = CG.mat3x3Translate(new Matrix(3, 3), 200, 300);
+        let transform_final3 = Matrix.multiply([translation_matrix3, rotation3]);
+        this.models.slide3[4].transform = transform_final3;
+
+
+
+
     }
     
     
@@ -321,15 +493,18 @@ class Renderer {
     //
     drawSlide0() {
         let teal = [0, 128, 128, 255];
+        let centerX = this.models.slide0[0].t_x;
+        let centerY = this.models.slide0[0].t_y; 
+        let radius = 50;
         let vertices = [];
-        for (let i=0; i < this.models.slide0[0].origin.length; i++) {
-            let new_vertex = Matrix.multiply([this.models.slide0[0].transform, this.models.slide0[0].origin[i]]);
-            vertices.push(new_vertex);
+        for (let angle = 0; angle < 2 * Math.PI; angle += 0.01) {
+            let x = centerX + radius * Math.cos(angle);
+            let y = centerY + radius * Math.sin(angle);
+            vertices.push(CG.Vector3(x, y, 1));
         }
         this.drawConvexPolygon(vertices, teal);
     }
 
-    
     drawSlide1() {
         let teal = [0, 128, 128, 255];
         let red = [255, 0, 0, 255];
@@ -365,7 +540,6 @@ class Renderer {
             let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[0].origin[i]]);
             vertices.push(new_vertex);
         }
-        console.log(vertices);
         this.drawConvexPolygon(vertices, color1);
 
         let color2 = [100,200,100,255];
@@ -374,18 +548,50 @@ class Renderer {
             let new_vertex = Matrix.multiply([this.models.slide2[1].transform, this.models.slide2[1].origin[i]]);
             vertices_2.push(new_vertex);
         }
-        console.log(vertices_2);
         this.drawConvexPolygon(vertices_2, color2);
     }
 
-    //
     drawSlide3() {
         // TODO: get creative!
         //   - animation should involve all three basic transformation types
         //     (translation, scaling, and rotation)
+        let color1 = [200, 228, 128, 255];
+        let vertices = [];
+        for (let i=0; i < this.models.slide3[0].origin.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide3[0].transform, this.models.slide3[0].origin[i]]);
+            vertices.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices, color1);
+
+        let color3 = [0, 0, 255, 255];
+        let vertices3 = [];
+        for (let i=0; i < this.models.slide3[1].origin.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide3[1].transform, this.models.slide3[1].origin[i]]);
+            vertices3.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices3, color3);  
         
+        let color4 = [0, 255, 255, 255];
+        let vertices4 = [];
+        for (let i=0; i < this.models.slide3[2].origin.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide3[2].transform, this.models.slide3[2].origin[i]]);
+            vertices4.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices4, color4);   
+
+        //------------------------------------
+        // Spinning Polygon
+        //------------------------------------
+        let vertices_four = [];
+        for (let i = 0; i < this.models.slide3[4].vertices.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide3[4].transform, this.models.slide3[3].origin[i]]);
+            vertices_four.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices_four, [1, 25, 200, 255]);
         
     }
+
+        
     
     // vertex_list:  array of object [Matrix(3, 1), Matrix(3, 1), ..., Matrix(3, 1)]
     // color:        array of int [R, G, B, A]
