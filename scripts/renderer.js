@@ -203,19 +203,39 @@ class Renderer {
         // Slide1 - spinning polygons
         // ------ Polygon 1 ------
         let theta = 10;
-        let theta_new = theta*time/100000;
+        let theta_new = theta * time / 100000;
 
-        let rotation = CG.mat3x3Rotate(new Matrix(3,3), theta_new);
-        let translation_matrix = CG.mat3x3Translate(new Matrix(3,3), 200, 200);
+        let rotation = CG.mat3x3Rotate(new Matrix(3, 3), theta_new);
+        let translation_matrix = CG.mat3x3Translate(new Matrix(3, 3), 200, 200);
         let transform_final = Matrix.multiply([translation_matrix, rotation]);
         this.models.slide1[0].transform = transform_final;
 
         // ------ Polygon 2 ------ (spinning opposite)
 
+        let theta1 = -20; 
+        let theta_new1 = theta1 * time / 100000; 
+
+        let rotation1 = CG.mat3x3Rotate(new Matrix(3, 3), theta_new1);
+        let translation_matrix1 = CG.mat3x3Translate(new Matrix(3, 3), 400, 400); 
+        let transform_final1 = Matrix.multiply([translation_matrix1, rotation1]);
+        this.models.slide1[1].transform = transform_final1; 
+
         // ------ Polygon 3 ------ (different speed)
 
+        let theta2 = 60; 
+        let theta_new2 = theta2 * time / 100000; 
 
+        let rotation2 = CG.mat3x3Rotate(new Matrix(3, 3), theta_new2);
+        let translation_matrix2 = CG.mat3x3Translate(new Matrix(3, 3), 600, 200); 
+        let transform_final2 = Matrix.multiply([translation_matrix2, rotation2]);
+        this.models.slide1[2].transform = transform_final2; 
+
+<<<<<<< HEAD
         // Slide2 - Grow/shrink ---old
+=======
+       
+        // Slide2 - Grow/shrink
+>>>>>>> 662e82f494eedcac0cfb0d891a918f1740b8f7ee
         let sx = .1;
         let sy= .1;
 
@@ -302,14 +322,29 @@ class Renderer {
         //   - have each polygon spin at a different speed / direction
 
         let teal = [0, 128, 128, 255];
+        let red = [255, 0, 0, 255];
+        let blue = [0, 0, 255, 255];
 
         let vertices_one = [];
-        for (let i=0; i < this.models.slide1[0].origin.length; i++) {
+        for (let i = 0; i < this.models.slide1[0].origin.length; i++) {
             let new_vertex = Matrix.multiply([this.models.slide1[0].transform, this.models.slide1[0].origin[i]]);
             vertices_one.push(new_vertex);
         }
         this.drawConvexPolygon(vertices_one, teal);
 
+        let vertices_two = [];
+        for (let i = 0; i < this.models.slide1[1].vertices.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide1[1].transform, this.models.slide1[0].origin[i]]);
+            vertices_two.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices_two, red);
+
+        let vertices_three = [];
+        for (let i = 0; i < this.models.slide1[2].vertices.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide1[2].transform, this.models.slide1[0].origin[i]]);
+            vertices_three.push(new_vertex);
+        }
+        this.drawConvexPolygon(vertices_three, blue);
 
         // let vertices_two = [];
         // for (let i=0; i < this.models.slide1[0].vertices.length; i++) {
