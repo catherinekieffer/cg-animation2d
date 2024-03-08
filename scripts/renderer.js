@@ -36,6 +36,10 @@ class Renderer {
                             CG.Vector3(150, 0, 1)
                             //we just add more edges here to be a circle!
                         ],
+                    t_x: 150,
+                    t_y: 150,
+                    velocity_x: 200,
+                    velocity_y: 100
                 }
             ],
             slide1: [
@@ -76,23 +80,27 @@ class Renderer {
                     transform: null
                 }
             ],
-            slide2: [  
+            slide2: [                
                 {
-                    origin:  [
-                        CG.Vector3(0, 150, 1),
+                    transform: null,
+                    origin: [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
                         CG.Vector3(-150, 0, 1),
                         CG.Vector3(0, -150, 1),
-                        CG.Vector3(150, 0, 1),
+                        CG.Vector3(150, 0, 1)
                     ],
-                },              
-                {
+                    current: [
+                        CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
+                        CG.Vector3(-150, 0, 1),
+                        CG.Vector3(0, -150, 1),
+                        CG.Vector3(150, 0, 1)
+                    ],
                     vertices: [
                         CG.Vector3(400, 150, 1),
                         CG.Vector3(500, 300, 1),
                         CG.Vector3(400, 450, 1),
                         CG.Vector3(300, 300, 1)
-                    ],
-                    transform: null
+                    ]
                 }
             ],
             slide3: []
@@ -158,22 +166,38 @@ class Renderer {
         //if you need to do two things, you can do T(tx, tx)*R(theta) - spinning and moving... etc
         //                                           rotate first, translate second
 
-        let velocity_x = 80;
-        let velocity_y = 50;
+        //get the velocities
+        let velocity_x = this.models.slide0[0].velocity_x;
+        let velocity_y = this.models.slide0[0].velocity_y;
         
-        let t_x = velocity_x * delta_time/1000; // ---------------->>>>> how can you use this to determine the locaiton? becuase we are going to multiply this by the current in drawslide....?
-        let t_y = velocity_y * delta_time/1000;
+        //calculate newest t_x and t_y
+        let t_x = this.models.slide0[0].t_x + velocity_x * delta_time/1000;
+        let t_y = this.models.slide0[0].t_y + velocity_y * delta_time/1000;
 
-        // console.log(t_x);
-        //gets to 1324 and then bounces between 3 numbers...?
-        //t_x only get to 13.....? its because of my delta_time?
-        if (t_x > this.canvas.width) {
-            t_x = -1*t_x;
-        } 
-
-
+        // if t_x is too wide, flip the velocity of the x and set that to negative in the model
+        if (t_x > this.canvas.width-140) {
+            velocity_x = -1*velocity_x;
+            t_x = this.models.slide0[0].t_x + (velocity_x * delta_time/1000);
+            this.models.slide0[0].velocity_x = velocity_x;
+        } else if (t_x < 140) {
+            velocity_x = -1*velocity_x;
+            t_x = this.models.slide0[0].t_x + (velocity_x * delta_time/1000);
+            this.models.slide0[0].velocity_x = velocity_x;
+        } else if (t_y > this.canvas.height-140) {
+            velocity_y = -1*velocity_y;
+            t_y = this.models.slide0[0].t_y + (velocity_y * delta_time/1000);
+            this.models.slide0[0].velocity_y = velocity_y;
+        } else if (t_y < 140) {
+            velocity_y = -1*velocity_y;
+            t_y = this.models.slide0[0].t_y + (velocity_y * delta_time/1000);
+            this.models.slide0[0].velocity_y = velocity_y;
+        }
+        this.models.slide0[0].t_x = t_x;
+        this.models.slide0[0].t_y = t_y;
+        
         let transform = CG.mat3x3Translate(new Matrix(3,3), t_x, t_y);
         this.models.slide0[0].transform = transform;
+
 
 
         // Slide1 - spinning polygons
@@ -191,28 +215,53 @@ class Renderer {
         // ------ Polygon 3 ------ (different speed)
 
 
-        // Slide2 - Grow/shrink
+        // Slide2 - Grow/shrink ---old
         let sx = .1;
         let sy= .1;
-        let s_x = 0;
-        let s_y = 0;
 
-        if (s_x <= .3 || s_y <= .3) {
-            s_x = sx*(delta_time/1000); //.1* 1, .1* 2
-            s_y = sy*(delta_time/1000);
-        }
+        // let s_x = sx*delta_time/100;
+        // let s_y = sy*delta_time/100;
         
-        // console.log(s_x)
-        if (s_x > .2  || s_y > .2) {
-            s_x = sx/(delta_time/1000);
-            s_y = sy/(delta_time/1000);
+        let s_x = sx*time/1000;
+        let s_y = sy*time/1000;
+        // console.log(time);
+
+        if (time > 10000) {
+            s_x = s_x/(time/1000);
+            s_y = s_y/(time/1000);
         }
+        // if (time > 10000
 
-        let grow_shrink = CG.mat3x3Scale(new Matrix(3,3), s_x, s_y);
 
-        let translation_matrix_grow_shrink = CG.mat3x3Translate(new Matrix(3,3), 200, 200);
-        let transform_final_grow_shrink = Matrix.multiply([translation_matrix_grow_shrink, grow_shrink]);
-        this.models.slide2[0].transform = transform_final_grow_shrink;
+        let grow_shrink = CG.mat3x3Scale(new Matrix(3,3), s_x, s_y); 
+        let translation_matrix_grow_shrink = CG.mat3x3Translate(new Matrix(3,3), 200, 200); // move the matrix 200 pixels
+        let transform_final_grow_shrink = Matrix.multiply([translation_matrix_grow_shrink, grow_shrink]); //grow the matrix, then move it
+        this.models.slide2[0].transform = transform_final_grow_shrink
+        // console.log(this.models.slide2[0].transform);
+
+        // Slide2 - Grow/shrink ---new
+
+        // let sx = .1;
+        // let sy= .1;
+        // let s_x = 0;
+        // let s_y = 0;
+
+        // if (s_x <= .3 || s_y <= .3) {
+        //     s_x = sx*(delta_time/1000); //.1* 1, .1* 2
+        //     s_y = sy*(delta_time/1000);
+        // }
+        
+        // // console.log(s_x)
+        // if (s_x > .2  || s_y > .2) {
+        //     s_x = sx/(delta_time/1000);
+        //     s_y = sy/(delta_time/1000);
+        // }
+
+        // let grow_shrink = CG.mat3x3Scale(new Matrix(3,3), s_x, s_y);
+
+        // let translation_matrix_grow_shrink = CG.mat3x3Translate(new Matrix(3,3), 200, 200);
+        // let transform_final_grow_shrink = Matrix.multiply([translation_matrix_grow_shrink, grow_shrink]);
+        // this.models.slide2[0].transform = transform_final_grow_shrink;
 
     }
     
@@ -244,8 +293,6 @@ class Renderer {
             let new_vertex = Matrix.multiply([this.models.slide0[0].transform, this.models.slide0[0].current[i]]);
             vertices.push(new_vertex);
         }
-        this.models.slide0[0].current = vertices;
-        // console.log(this.models.slide0[0].current);
         this.drawConvexPolygon(vertices, teal);
     }
 
@@ -282,17 +329,29 @@ class Renderer {
     drawSlide2() {
         // TODO: draw at least 2 polygons grow and shrink about their own centers
         //   - have each polygon grow / shrink different sizes
-        //   - try at least 1 polygon that grows / shrinks non-uniformly in the x and y directions
+        //   - try at least 1 polygon that grows / shrinks non-uniformly in the x and y direction
 
+        //works but doens't stop growing
         let teal = [0, 128, 128, 255];
 
         let vertices_one = [];
-        for (let i=0; i < this.models.slide2[1].vertices.length; i++) {
-            let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[1].vertices[i]]);
+        for (let i=0; i < this.models.slide2[0].origin.length; i++) {
+            let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[0].origin[i]]);
             vertices_one.push(new_vertex);
+            console.log(vertices_one);
         }
-        this.models.slide2[1].vertices = vertices_one;
         this.drawConvexPolygon(vertices_one, teal);
+
+
+        // let teal = [0, 128, 128, 255];
+
+        // let vertices_one = [];
+        // for (let i=0; i < this.models.slide2[1].vertices.length; i++) {
+        //     let new_vertex = Matrix.multiply([this.models.slide2[0].transform, this.models.slide2[1].vertices[i]]);
+        //     vertices_one.push(new_vertex);
+        // }
+        // this.models.slide2[1].vertices = vertices_one;
+        // this.drawConvexPolygon(vertices_one, teal);
 
     }
 
