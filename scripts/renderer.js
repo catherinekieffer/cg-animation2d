@@ -109,6 +109,7 @@ class Renderer {
                     size_x: .1, //how fast it grows in the x direction
                     size_y: .3,
                     magnitude: 1.2, //how big it gets
+                    color: [0, 128, 128, 255],
                     origin: [
                         CG.Vector3(0, 150, 1), //this is the point, calling Vector3 is turning the point into a matrix
                         CG.Vector3(-150, 0, 1),
@@ -180,8 +181,8 @@ class Renderer {
                         ],
                     t_x: 150,
                     t_y: 150,
-                    velocity_x: 200,
-                    velocity_y: 100
+                    velocity_x: 400,
+                    velocity_y: 200
                 }
             ],
         };
@@ -504,18 +505,23 @@ class Renderer {
             velocity_x1 = -1*velocity_x1;
             t_x1 = this.models.slide3[6].t_x + (velocity_x1 * delta_time/1000);
             this.models.slide3[6].velocity_x = velocity_x1;
+            this.models.slide3[0].color = [100, 0, 150, 255];
         } else if (t_x1 < 50) {
             velocity_x1 = -1*velocity_x1;
             t_x1 = this.models.slide3[6].t_x + (velocity_x1 * delta_time/1000);
             this.models.slide3[6].velocity_x = velocity_x1;
+            this.models.slide3[0].color = [189, 0, 1, 255];
         } else if (t_y1 > this.canvas.height-50) {
             velocity_y1 = -1*velocity_y1;
             t_y1 = this.models.slide3[6].t_y + (velocity_y1 * delta_time/1000);
             this.models.slide3[6].velocity_y = velocity_y1;
+            this.models.slide3[0].color = [50, 100, 200, 255];
         } else if (t_y1 < 50) {
             velocity_y1 = -1*velocity_y1;
             t_y1 = this.models.slide3[6].t_y + (velocity_y1 * delta_time/1000);
             this.models.slide3[6].velocity_y = velocity_y1;
+            this.models.slide3[0].color = [200, 0, 150, 255];
+
         }
         this.models.slide3[6].t_x = t_x1;
         this.models.slide3[6].t_y = t_y1;
@@ -606,9 +612,6 @@ class Renderer {
     }
 
     drawSlide3() {
-        // TODO: get creative!
-        //   - animation should involve all three basic transformation types
-        //     (translation, scaling, and rotation)
         let color1 = [200, 228, 128, 255];
         let vertices = [];
         for (let i=0; i < this.models.slide3[0].origin.length; i++) {
@@ -654,7 +657,8 @@ class Renderer {
         // CIRCLE
         //------------------------------------
 
-        let teal = [0, 128, 128, 255];
+        // let teal = [0, 128, 128, 255];
+        let color = this.models.slide3[0].color;
         let centerX = this.models.slide3[6].t_x;
         let centerY = this.models.slide3[6].t_y; 
         let radius = 50;
@@ -664,7 +668,7 @@ class Renderer {
             let y = centerY + radius * Math.sin(angle);
             vertices_circle.push(CG.Vector3(x, y, 1));
         }
-        this.drawConvexPolygon(vertices_circle, teal);
+        this.drawConvexPolygon(vertices_circle, color);
     }
  
     // vertex_list:  array of object [Matrix(3, 1), Matrix(3, 1), ..., Matrix(3, 1)]
